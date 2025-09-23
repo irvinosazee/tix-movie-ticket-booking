@@ -30,7 +30,7 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png" />
       </Head>
-      <body className={`font-sans ${poppins.variable} antialiased`}>
+      <body className={`font-sans ${poppins.className} antialiased`}>
         <Suspense fallback={null}>{children}</Suspense>
         <Analytics />
       </body>

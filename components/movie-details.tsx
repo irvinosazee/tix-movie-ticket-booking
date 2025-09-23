@@ -171,7 +171,7 @@ export function MovieDetails({ movieId }: MovieDetailsProps) {
 
         <div className="grid md:grid-cols-3 gap-8 mb-12">
           <div className="relative aspect-[3/4] rounded-xl overflow-hidden card-shadow-lg">
-            <Image src={movie.posterUrl || "/placeholder.svg"} alt={movie.title} fill className="object-cover" />
+            <Image src={"/placeholder.svg"} alt={movie.title} fill className="object-cover" />
           </div>
 
           <div className="md:col-span-2">

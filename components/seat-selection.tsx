@@ -256,7 +256,7 @@ export function SeatSelection({ showtimeId }: SeatSelectionProps) {
               </div>
 
               <div className="space-y-4 mb-6">
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="name" className="font-medium">
                     Full Name
                   </Label>
@@ -268,7 +268,7 @@ export function SeatSelection({ showtimeId }: SeatSelectionProps) {
                     className="rounded-xl border-border focus:border-primary"
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="email" className="font-medium">
                     Email
                   </Label>

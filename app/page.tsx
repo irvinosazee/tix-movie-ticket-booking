@@ -52,7 +52,7 @@ export default function HomePage() {
         <MovieGrid />
       </main>
 
-      <footer className="border-t border-gray-200 bg-white/80 backdrop-blur-sm mt-16">
+      <footer className=" bg-white/80 backdrop-blur-sm mt-16">
         <div className="container mx-auto px-4 py-6">
           <div className="text-center">
             <h3 className="text-xl font-bold text-gradient mb-2">Tix</h3>
