@@ -1,6 +1,5 @@
 import { MovieGrid } from "@/components/movie-grid"
 import { Header } from "@/components/ui/header"
-import { Button } from "@/components/ui/button"
 import { Search, Star, Clock, MapPin } from "lucide-react"
 
 export default function HomePage() {

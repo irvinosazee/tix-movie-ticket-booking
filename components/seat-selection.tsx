@@ -9,21 +9,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ArrowLeft, Clock, Calendar, MapPin, Ticket, User, Mail, Star, Shield } from "lucide-react"
 import { cn } from "@/lib/utils"
-
-interface Seat {
-  id: string
-  row: string
-  number: number
-  status: "available" | "selected" | "booked"
-}
-
-interface ShowtimeInfo {
-  id: string
-  movieTitle: string
-  time: string
-  date: string
-  theater: string
-}
+import {
+  getShowtimeInfo,
+  generateSeatMap,
+  calculateTotalPrice,
+  type Seat,
+  type ShowtimeInfo
+} from "@/lib/data"
+import { Header } from "./ui/header"
 
 interface SeatSelectionProps {
   showtimeId: string
@@ -44,34 +37,21 @@ export function SeatSelection({ showtimeId }: SeatSelectionProps) {
   useEffect(() => {
     const fetchSeatMap = async () => {
       try {
-        // Mock data for demonstration
-        const mockShowtime: ShowtimeInfo = {
-          id: showtimeId,
-          movieTitle: "The Dark Knight",
-          time: "2:00 PM",
-          date: "Today",
-          theater: "Theater 1",
+        // Get showtime info from centralized data
+        const showtimeInfo = getShowtimeInfo(showtimeId)
+
+        if (!showtimeInfo) {
+          throw new Error("Showtime not found")
         }
 
-        // Generate seat map (8 rows, 12 seats per row)
-        const mockSeats: Seat[] = []
-        const rows = ["A", "B", "C", "D", "E", "F", "G", "H"]
-        const bookedSeats = ["A5", "A6", "B3", "C7", "C8", "D1", "F9", "F10", "G4", "H2", "H11"]
+        // Generate seat map from centralized data
+        const seatMap = generateSeatMap(showtimeId)
 
-        rows.forEach((row) => {
-          for (let i = 1; i <= 12; i++) {
-            const seatId = `${row}${i}`
-            mockSeats.push({
-              id: seatId,
-              row,
-              number: i,
-              status: bookedSeats.includes(seatId) ? "booked" : "available",
-            })
-          }
-        })
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 500))
 
-        setShowtime(mockShowtime)
-        setSeats(mockSeats)
+        setShowtime(showtimeInfo)
+        setSeats(seatMap)
       } catch (error) {
         console.error("Failed to fetch seat map:", error)
       } finally {
@@ -123,8 +103,8 @@ export function SeatSelection({ showtimeId }: SeatSelectionProps) {
     }
   }
 
-  const getSeatPrice = () => 12.5 // Fixed price per seat
-  const getTotalPrice = () => selectedSeats.length * getSeatPrice()
+  const getSeatPrice = () => showtime?.price || 12.5 // Use showtime price from centralized data
+  const getTotalPrice = () => calculateTotalPrice(showtimeId, selectedSeats.length)
 
   if (loading) {
     return (
@@ -189,29 +169,7 @@ export function SeatSelection({ showtimeId }: SeatSelectionProps) {
   return (
     <div className="min-h-screen gradient-bg">
       {/* Header with Logo and Navigation */}
-      <header className="bg-card/80 backdrop-blur-sm border-b border-border sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" asChild className="hover:bg-card/50 rounded-xl p-2">
-                <Link href="/" className="flex items-center gap-2">
-                  <ArrowLeft className="h-5 w-5" />
-                </Link>
-              </Button>
-              <div className="flex items-center">
-                <div>
-                  <h1 className="text-xl font-bold text-gradient">Tix</h1>
-                  <p className="text-xs text-muted-foreground">Movie Tickets</p>
-                </div>
-              </div>
-            </div>
-            <div className="hidden md:flex items-center gap-2 text-sm">
-              <Shield className="h-4 w-4 text-primary" />
-              <span className="text-muted-foreground">Secure Booking</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <div className="container mx-auto px-4 py-8">
         {/* Movie Info Header */}

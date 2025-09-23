@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Search, Shield } from "lucide-react"
+import {  Shield } from "lucide-react"
 
 
 export function Header() {
@@ -15,14 +15,14 @@ export function Header() {
                     <div className="flex items-center gap-4">
                         <Button variant="ghost" asChild className="hover:bg-card/50 rounded-xl p-2">
                             <Link href="/" className="flex items-center gap-2">
-                                <ArrowLeft className="h-5 w-5" />
-                            </Link>
-                        </Button>
-                        <div className="flex items-center">
-                            <div>
+                                <div>
                                 <h1 className="text-xl font-bold text-gradient">Tix</h1>
                                 <p className="text-xs text-muted-foreground">Movie Tickets</p>
                             </div>
+                            </Link>
+                        </Button>
+                        <div className="flex items-center">
+                            
                         </div>
                     </div>
                     <div className="hidden md:flex items-center gap-2 text-sm">

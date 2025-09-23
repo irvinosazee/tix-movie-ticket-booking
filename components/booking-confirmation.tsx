@@ -6,19 +6,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Header } from "@/components/ui/header"
 import { CheckCircle, Calendar, Clock, MapPin, Ticket, Download, Printer, QrCode } from "lucide-react"
-
-interface BookingDetails {
-  id: string
-  movieTitle: string
-  showtime: string
-  date: string
-  theater: string
-  seats: string[]
-  customerName: string
-  customerEmail: string
-  totalAmount: number
-  bookingDate: string
-}
+import { generateMockBooking, type BookingDetails } from "@/lib/data"
 
 interface BookingConfirmationProps {
   bookingId: string
@@ -31,19 +19,8 @@ export function BookingConfirmation({ bookingId }: BookingConfirmationProps) {
   useEffect(() => {
     const fetchBookingDetails = async () => {
       try {
-        // Mock data for demonstration
-        const mockBooking: BookingDetails = {
-          id: bookingId,
-          movieTitle: "The Dark Knight",
-          showtime: "2:00 PM",
-          date: "Today",
-          theater: "Theater 1",
-          seats: ["A7", "A8"],
-          customerName: "John Doe",
-          customerEmail: "john.doe@example.com",
-          totalAmount: 25.0,
-          bookingDate: new Date().toLocaleDateString(),
-        }
+        // Generate booking details from centralized data
+        const mockBooking = generateMockBooking(bookingId)
 
         // Simulate API delay
         await new Promise((resolve) => setTimeout(resolve, 1000))

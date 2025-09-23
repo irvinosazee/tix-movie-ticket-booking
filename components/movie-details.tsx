@@ -5,28 +5,15 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Header } from "@/components/ui/header"
-import { ArrowLeft, Clock, Star, Calendar, MapPin, Shield } from "lucide-react"
-
-interface Movie {
-  id: string
-  title: string
-  posterUrl: string
-  duration: number
-  description: string
-  genre: string
-  rating: string
-  imdbRating?: number
-  releaseYear?: number
-}
-
-interface Showtime {
-  id: string
-  time: string
-  date: string
-  availableSeats: number
-  theater?: string
-  price?: number
-}
+import { Clock, Star, Calendar, MapPin, Shield } from "lucide-react"
+import {
+  getMovieById,
+  getShowtimesByMovieId,
+  getPosterUrl,
+  formatDuration,
+  type Movie,
+  type Showtime
+} from "@/lib/data"
 
 interface MovieDetailsProps {
   movieId: string
@@ -40,93 +27,15 @@ export function MovieDetails({ movieId }: MovieDetailsProps) {
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
-        // Mock data for demonstration
-        const mockMovies: Record<string, Movie> = {
-          "1": {
-            id: "1",
-            title: "The Dark Knight",
-            posterUrl: "/dark-knight-poster.png",
-            duration: 152,
-            description:
-              "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.",
-            genre: "Action, Crime, Drama",
-            rating: "PG-13",
-            imdbRating: 9.0,
-            releaseYear: 2008,
-          },
-          "2": {
-            id: "2",
-            title: "Inception",
-            posterUrl: "/inception-movie-poster.png",
-            duration: 148,
-            description:
-              "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
-            genre: "Action, Sci-Fi, Thriller",
-            rating: "PG-13",
-            imdbRating: 8.8,
-            releaseYear: 2010,
-          },
-          "3": {
-            id: "3",
-            title: "Interstellar",
-            posterUrl: "/interstellar-movie-poster.jpg",
-            duration: 169,
-            description:
-              "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",
-            genre: "Adventure, Drama, Sci-Fi",
-            rating: "PG-13",
-            imdbRating: 8.6,
-            releaseYear: 2014,
-          },
-          "4": {
-            id: "4",
-            title: "Dune",
-            posterUrl: "/dune-inspired-poster.png",
-            duration: 155,
-            description:
-              "Feature adaptation of Frank Herbert's science fiction novel about the son of a noble family entrusted with the protection of the most valuable asset and most vital element in the galaxy.",
-            genre: "Action, Adventure, Drama",
-            rating: "PG-13",
-            imdbRating: 8.0,
-            releaseYear: 2021,
-          },
-          "5": {
-            id: "5",
-            title: "Top Gun: Maverick",
-            posterUrl: "/top-gun-maverick-movie-poster.jpg",
-            duration: 130,
-            description:
-              "After thirty years, Maverick is still pushing the envelope as a top naval aviator, but must confront ghosts of his past when he leads TOP GUN's elite graduates on a mission that demands the ultimate sacrifice.",
-            genre: "Action, Drama",
-            rating: "PG-13",
-            imdbRating: 8.3,
-            releaseYear: 2022,
-          },
-          "6": {
-            id: "6",
-            title: "Avatar: The Way of Water",
-            posterUrl: "/avatar-way-of-water-movie-poster.jpg",
-            duration: 192,
-            description:
-              "Jake Sully lives with his newfound family formed on the extrasolar moon Pandora. Once a familiar threat returns to finish what was previously started, Jake must work with Neytiri and the army of the Na'vi race to protect their home.",
-            genre: "Action, Adventure, Family",
-            rating: "PG-13",
-            imdbRating: 7.6,
-            releaseYear: 2022,
-          },
-        }
+        // Get movie and showtimes from centralized data
+        const movie = getMovieById(movieId)
+        const showtimes = getShowtimesByMovieId(movieId)
 
-        const mockShowtimes: Showtime[] = [
-          { id: "1", time: "2:00 PM", date: "Today", availableSeats: 45, theater: "Cinema Hall 1", price: 12.99 },
-          { id: "2", time: "5:30 PM", date: "Today", availableSeats: 32, theater: "Cinema Hall 2", price: 12.99 },
-          { id: "3", time: "8:45 PM", date: "Today", availableSeats: 18, theater: "IMAX Theater", price: 18.99 },
-          { id: "4", time: "1:15 PM", date: "Tomorrow", availableSeats: 50, theater: "Cinema Hall 1", price: 12.99 },
-          { id: "5", time: "4:30 PM", date: "Tomorrow", availableSeats: 41, theater: "Cinema Hall 2", price: 12.99 },
-          { id: "6", time: "7:45 PM", date: "Tomorrow", availableSeats: 28, theater: "IMAX Theater", price: 18.99 },
-        ]
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 500))
 
-        setMovie(mockMovies[movieId] || null)
-        setShowtimes(mockShowtimes)
+        setMovie(movie)
+        setShowtimes(showtimes)
       } catch (error) {
         console.error("Failed to fetch movie details:", error)
       } finally {
@@ -136,12 +45,6 @@ export function MovieDetails({ movieId }: MovieDetailsProps) {
 
     fetchMovieDetails()
   }, [movieId])
-
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60)
-    const mins = minutes % 60
-    return `${hours}h ${mins}m`
-  }
 
   if (loading) {
     return (
@@ -216,36 +119,14 @@ export function MovieDetails({ movieId }: MovieDetailsProps) {
   return (
     <div className="min-h-screen gradient-bg">
       {/* Header with Logo and Navigation */}
-      <header className="bg-card/80 backdrop-blur-sm border-b border-border sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" asChild className="hover:bg-card/50 rounded-xl p-2">
-                <Link href="/" className="flex items-center gap-2">
-                  <ArrowLeft className="h-5 w-5" />
-                </Link>
-              </Button>
-              <div className="flex items-center">
-                <div>
-                  <h1 className="text-xl font-bold text-gradient">Tix</h1>
-                  <p className="text-xs text-muted-foreground">Movie Tickets</p>
-                </div>
-              </div>
-            </div>
-            <div className="hidden md:flex items-center gap-2 text-sm">
-              <Shield className="h-4 w-4 text-primary" />
-              <span className="text-muted-foreground">Secure Booking</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8 mb-12">
           <div className="relative w-full max-w-sm mx-auto lg:mx-0 lg:w-80 lg:flex-shrink-0">
             <div className="aspect-[2/3] rounded-2xl overflow-hidden card-shadow-xl group">
               <Image
-                src={movie.posterUrl || "/placeholder.svg"}
+                src={getPosterUrl(movie.id)}
                 alt={movie.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
