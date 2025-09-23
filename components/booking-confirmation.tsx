@@ -8,24 +8,39 @@ import { Header } from "@/components/ui/header"
 import { CheckCircle, Calendar, Clock, MapPin, Ticket, Download, Printer, QrCode } from "lucide-react"
 import { generateMockBooking, type BookingDetails } from "@/lib/data"
 
+// Create a type that matches the API response
+interface APIBookingDetails {
+  id: string
+  movieTitle: string
+  posterUrl?: string
+  showtime: string
+  date: string
+  theater: string
+  seats: string[]
+  customerName: string
+  customerEmail: string
+  totalAmount: number
+  bookingDate: string | Date
+}
+
 interface BookingConfirmationProps {
   bookingId: string
 }
 
 export function BookingConfirmation({ bookingId }: BookingConfirmationProps) {
-  const [booking, setBooking] = useState<BookingDetails | null>(null)
+  const [booking, setBooking] = useState<APIBookingDetails | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchBookingDetails = async () => {
       try {
-        // Generate booking details from centralized data
-        const mockBooking = generateMockBooking(bookingId)
+        const response = await fetch(`/api/bookings/${bookingId}`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch booking details')
+        }
 
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-
-        setBooking(mockBooking)
+        const data = await response.json()
+        setBooking(data)
       } catch (error) {
         console.error("Failed to fetch booking details:", error)
       } finally {

@@ -10,9 +10,6 @@ import { Label } from "@/components/ui/label"
 import { ArrowLeft, Clock, Calendar, MapPin, Ticket, User, Mail, Star, Shield } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
-  getShowtimeInfo,
-  generateSeatMap,
-  calculateTotalPrice,
   type Seat,
   type ShowtimeInfo
 } from "@/lib/data"
@@ -37,23 +34,17 @@ export function SeatSelection({ showtimeId }: SeatSelectionProps) {
   useEffect(() => {
     const fetchSeatMap = async () => {
       try {
-        // Get showtime info from centralized data
-        const showtimeInfo = getShowtimeInfo(showtimeId)
-
-        if (!showtimeInfo) {
-          throw new Error("Showtime not found")
+        const response = await fetch(`/api/showtimes/${showtimeId}/seats`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch seat map')
         }
 
-        // Generate seat map from centralized data
-        const seatMap = generateSeatMap(showtimeId)
+        const data = await response.json()
 
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500))
-
-        setShowtime(showtimeInfo)
-        setSeats(seatMap)
+        setShowtime(data.showtime)
+        setSeats(data.seats)
       } catch (error) {
-        console.error("Failed to fetch seat map:", error)
+        console.error('Error fetching seat map:', error)
       } finally {
         setLoading(false)
       }
@@ -81,30 +72,36 @@ export function SeatSelection({ showtimeId }: SeatSelectionProps) {
     setBooking(true)
 
     try {
-      // Mock API call
-      const bookingData = {
-        showtimeId,
-        seats: selectedSeats,
-        customerName: customerInfo.name,
-        customerEmail: customerInfo.email,
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          showtimeId,
+          selectedSeats,
+          customerName: customerInfo.name,
+          customerEmail: customerInfo.email,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Booking failed')
       }
 
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // Generate mock booking ID
-      const bookingId = `BK${Date.now().toString().slice(-6)}`
+      const data = await response.json()
 
       // Navigate to confirmation page
-      router.push(`/bookings/${bookingId}`)
+      router.push(`/bookings/${data.bookingId}`)
     } catch (error) {
       console.error("Booking failed:", error)
       setBooking(false)
     }
   }
 
-  const getSeatPrice = () => showtime?.price || 12.5 // Use showtime price from centralized data
-  const getTotalPrice = () => calculateTotalPrice(showtimeId, selectedSeats.length)
+  const getSeatPrice = () => showtime?.price || 12.5
+  const getTotalPrice = () => (showtime?.price || 12.5) * selectedSeats.length
 
   if (loading) {
     return (

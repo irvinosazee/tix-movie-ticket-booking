@@ -2,23 +2,22 @@
 
 import { useEffect, useState } from "react"
 import { MovieCard } from "./movie-card"
-import { getAllMovies, type Movie } from "@/lib/data"
+import { type Movie } from "@/lib/data"
 
 export function MovieGrid() {
   const [movies, setMovies] = useState<Movie[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate API call
+    // Fetch movies from API
     const fetchMovies = async () => {
       try {
-        // Get all movies from centralized data
-        const allMovies = getAllMovies()
-
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500))
-
-        setMovies(allMovies)
+        const response = await fetch('/api/movies')
+        if (!response.ok) {
+          throw new Error('Failed to fetch movies')
+        }
+        const data = await response.json()
+        setMovies(data)
       } catch (error) {
         console.error("Failed to fetch movies:", error)
       } finally {

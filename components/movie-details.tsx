@@ -7,35 +7,47 @@ import { Button } from "@/components/ui/button"
 import { Header } from "@/components/ui/header"
 import { Clock, Star, Calendar, MapPin, Shield } from "lucide-react"
 import {
-  getMovieById,
-  getShowtimesByMovieId,
-  getPosterUrl,
   formatDuration,
   type Movie,
-  type Showtime
 } from "@/lib/data"
+
+// Define types that match API responses
+interface APIShowtime {
+  id: string
+  time: string
+  date: string
+  price: number
+  availableSeats: number
+  theater: {
+    name: string
+    type: string
+  }
+}
+
+interface APIMovie extends Movie {
+  showtimes?: APIShowtime[]
+}
 
 interface MovieDetailsProps {
   movieId: string
 }
 
 export function MovieDetails({ movieId }: MovieDetailsProps) {
-  const [movie, setMovie] = useState<Movie | null>(null)
-  const [showtimes, setShowtimes] = useState<Showtime[]>([])
+  const [movie, setMovie] = useState<APIMovie | null>(null)
+  const [showtimes, setShowtimes] = useState<APIShowtime[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
-        // Get movie and showtimes from centralized data
-        const movie = getMovieById(movieId)
-        const showtimes = getShowtimesByMovieId(movieId)
+        const response = await fetch(`/api/movies/${movieId}`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch movie details')
+        }
 
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500))
-
-        setMovie(movie)
-        setShowtimes(showtimes)
+        const data = await response.json()
+        setMovie(data)
+        setShowtimes(data.showtimes || [])
       } catch (error) {
         console.error("Failed to fetch movie details:", error)
       } finally {
@@ -126,7 +138,7 @@ export function MovieDetails({ movieId }: MovieDetailsProps) {
           <div className="relative w-full max-w-sm mx-auto lg:mx-0 lg:w-80 lg:flex-shrink-0">
             <div className="aspect-[2/3] rounded-2xl overflow-hidden card-shadow-xl group">
               <Image
-                src={getPosterUrl(movie.id)}
+                src={movie.posterUrl}
                 alt={movie.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -211,7 +223,7 @@ export function MovieDetails({ movieId }: MovieDetailsProps) {
                   {showtime.theater && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="h-3 w-3" />
-                      <span>{showtime.theater}</span>
+                      <span>{showtime.theater.name}</span>
                     </div>
                   )}
 
