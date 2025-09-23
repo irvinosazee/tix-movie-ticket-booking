@@ -1,29 +1,12 @@
 import { MovieGrid } from "@/components/movie-grid"
+import { Header } from "@/components/ui/header"
 import { Button } from "@/components/ui/button"
 import { Search, Star, Clock, MapPin } from "lucide-react"
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gradient">Tix</h1>
-              <p className="text-gray-600 text-sm font-medium">Premium movie experience</p>
-            </div>
-
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search movies..."
-                className="pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all w-64 text-sm shadow-sm"
-              />
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8 text-center">
@@ -46,6 +29,16 @@ export default function HomePage() {
               <MapPin className="w-4 h-4 text-primary" />
               <span className="font-medium text-gray-700">Multiple Locations</span>
             </div>
+          </div>
+
+          {/* Search bar for mobile */}
+          <div className="relative md:hidden mb-6">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search movies..."
+              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all text-sm shadow-sm"
+            />
           </div>
         </div>
 
