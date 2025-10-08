@@ -333,7 +333,7 @@ export function SeatSelection({ showtimeId }: SeatSelectionProps) {
                 <div className="border-t border-primary/20 pt-2">
                   <div className="flex justify-between font-bold text-lg">
                     <span>Total Amount</span>
-                    <span className="text-primary">${getTotalPrice().toFixed(2)}</span>
+                    <span className="text-primary">₦{getTotalPrice().toFixed(2)}</span>
                   </div>
                 </div>
               </div>
